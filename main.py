@@ -13,7 +13,7 @@ class Deck:
         #1. iniitialize the deck will all possible combinations
         #2. shuffle the deck
         #3. deal the top card
-        #4. count remaining cards (check to see if empty)
+            #4. count remaining cards (check to see if empty)
 
     card_options = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
     suits = ['Hearts', 'Clubs', 'Diamonds', 'Spades']
@@ -33,13 +33,17 @@ class Deck:
         random.shuffle(self.cards)
         print('You have shuffled the deck') #just for testing purposes
 
+    #should return the top card and remove that card from the deck entirely
     def deal_card(self):
         if len(self.cards) > 0: #theres atleast one card to deal
             dealt_card = self.cards[0]
             self.cards.pop(0) #removes the card from the list
-            print(len(self.cards)) #tells us how many cards remain in the deck
-        return dealt_card
-        #should return the top card and remove that card from the deck entirely
+            cards_remaining = (len(self.cards)) #tells us how many cards remain in the deck
+        else:
+            self.cards = self.create_deck()
+
+        return dealt_card, cards_remaining
+        
 
 
 
