@@ -49,13 +49,15 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.hand = []
+        self.value = 0
     
     def add_card(self, card):
         self.hand.append(card)
 
     def show_full_hand(self): #will show all cards in terminal
+        print(self.name)
         for i in self.hand:
-            print(f'{self.name}: {i}')
+            print(i)
     
     def show_dealer_card(self):
         if self.name == 'Dealer': #just for safe measure that the instance is an actual dealer
@@ -64,10 +66,28 @@ class Player:
             print('error')
             
     def calc_hand_value(self):
-        pass
+        hand_value = 0
+        aces = 0
+        for i in self.hand:
+            #Card values can either be Ace, 1-10, or Jack, Queen, King
+            if i.value in ['Jack', 'Queen', 'King']: #face card values
+                hand_value += 10
+            elif i.value == 'Ace':
+                hand_value += 11
+                aces += 1
+            elif i.value.isdigit():
+                hand_value += int(i.value) #we simply just add the value of the card to the total hand value
+        if aces>1:
+            hand_value -= 11
+        print(hand_value)
+    
+    def print_hand_value(self):
+        print(self.value)
 
-    def hit_or_stand():
-        pass
+    def hit_or_stand(self): ##This needs more development
+        hit_stand = input('Would you like to hit or stand?: (h/s)')
+        if hit_stand != 'h' or hit_stand != 's':
+            print('error')
 
 
 
@@ -91,6 +111,8 @@ def main(): #controller of a hand of poker
 
     #showing the cards in the hand, only the first for the dealer
     player_instance.show_full_hand()
+
+    player_instance.calc_hand_value()
     
 
     
