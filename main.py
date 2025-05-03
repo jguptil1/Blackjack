@@ -10,7 +10,7 @@ class Card: #card instance
 
 class Deck:
     #Things this class will need to do:
-        #1. iniitialize the deck will all possible combinations
+        #1. iniitialize the deck wilth all possible combinations
         #2. shuffle the deck
         #3. deal the top card
             #4. count remaining cards (check to see if empty)
@@ -42,16 +42,58 @@ class Deck:
         else:
             self.cards = self.create_deck()
 
-        return dealt_card, cards_remaining
+        return dealt_card
         
+class Player:
+
+    def __init__(self, name):
+        self.name = name
+        self.hand = []
+    
+    def add_card(self, card):
+        self.hand.append(card)
+
+    def show_full_hand(self): #will show all cards in terminal
+        for i in self.hand:
+            print(f'{self.name}: {i}')
+    
+    def show_dealer_card(self):
+        if self.name == 'Dealer': #just for safe measure that the instance is an actual dealer
+            print(f'{self.name}: {self.hand[0]}')
+        else:
+            print('error')
+            
+    def calc_hand_value(self):
+        pass
+
+    def hit_or_stand():
+        pass
 
 
 
-def main():
-    deck = Deck() #creates a deck
-    deck.shuffle_deck() #shuffles the deck
-    deck.deal_card() #deals a card
+def main(): #controller of a hand of poker
+    
+    deck_instance = Deck() #creates a deck
+    deck_instance.shuffle_deck() #shuffles the deck
+    player_instance = Player(name='Player')
+    dealer_instance = Player(name='Dealer')
 
+
+    # creating the first hand for the player and dealer
+    for i in range(2):
+        dealt_card = deck_instance.deal_card()
+        player_instance.add_card(dealt_card)
+        dealt_card = deck_instance.deal_card()
+        dealer_instance.add_card(dealt_card)
+
+    #showing the dealers face up card
+    dealer_instance.show_dealer_card()
+
+    #showing the cards in the hand, only the first for the dealer
+    player_instance.show_full_hand()
+    
+
+    
 
 main()
 
