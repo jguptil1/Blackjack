@@ -55,7 +55,7 @@ class Player:
         self.hand.append(card)
 
     def show_full_hand(self): #will show all cards in terminal
-        print(self.name)
+        print(f'{self.name}: ')
         for i in self.hand:
             print(i)
     
@@ -79,17 +79,29 @@ class Player:
                 hand_value += int(i.value) #we simply just add the value of the card to the total hand value
         if aces>1:
             hand_value -= 11
-        print(hand_value)
+        #print(f'Current Hand Value: {hand_value}')
+        return hand_value
     
     def print_hand_value(self):
-        print(self.value)
+        print(f'Current hand value: {self.value}')
 
-    def hit_or_stand(self): ##This needs more development
-        hit_stand = input('Would you like to hit or stand?: (h/s)')
-        if hit_stand != 'h' or hit_stand != 's':
-            print('error')
-
-
+    def hit_or_stand(self):
+        #should return 'hit' or 'stand'
+        ##Dealer has automated rules, no input
+        if self.name == 'Dealer': #Should follow dealer rules on playing until atleast a hand value of 17
+            if self.value > 17:
+                return 'stand'
+            else:
+                return 'hit'
+        else: #Regular player logic
+            user_input = input('Would you like to hit or stand? (h/s): ')
+            if user_input.lower() == 'h':
+                return 'hit'
+            elif user_input.lower() == 's':
+                return 'stand'
+            else:
+                return 'bad input'
+            
 
 def main(): #controller of a hand of poker
     
@@ -112,10 +124,40 @@ def main(): #controller of a hand of poker
     #showing the cards in the hand, only the first for the dealer
     player_instance.show_full_hand()
 
-    player_instance.calc_hand_value()
-    
+    inital_hand_value = player_instance.calc_hand_value()
+    print(f'Current Hand Value: {inital_hand_value}')
 
-    
+
+    ### Bulk game logic ###
+
+    ##Start with the player
+
+    ## if hit, add a card and ask again until they bust or stand
+    while True:
+        player_decision = player_instance.hit_or_stand()
+        if player_decision.lower() == 'hit':
+            # Need to add a card to the hand. 
+            player_instance.add_card(deck_instance.deal_card())
+            #display the updated hand.
+            player_instance.show_full_hand()
+            #displaye the updated hand value
+            new_hand_value = player_instance.calc_hand_value()
+            print(f'New Hand Value: {new_hand_value}')
+
+            #if they bust:
+            if int(new_hand_value) > 21:
+                print('You have busted. End of Hand')
+                break
+            else: 
+                continue
+                
+        elif player_decision.lower() == 'stand':
+            pass
+            #This needs development
+            #should show the dealers full hand (need to add this method to the player class)
+            #should run the hit_or_stand method for the dealer instance
+
+
 
 main()
 
