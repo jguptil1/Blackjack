@@ -107,7 +107,45 @@ class Screen:
 
     ## Should be able to return various screens that I can access to give out to the user
     ## End Goal is to simplify the code within main or the game class if it has been refactored over
-    pass
+
+    ## Desired output look for a hand:
+        #Dealer Hand Example: 
+
+        # =======================  #line 1
+        # |     DEALER'S HAND    | #line 2
+        # |  [10♠] [Hidden]      | #line 3
+        # |  Total:              | #line 4
+        # =======================  #line 4
+
+        #Player Hand Example:
+
+        # =======================
+        # |     PLAYER'S HAND    |
+        # |  [8♦] [5♣]           |
+        # |  Total: 13           |
+        # =======================
+
+    def __init__(self, name, value, hand):
+        self.name = name #screen name, will be helpful for dileniated between the players screen and the dealers screen
+        self.hand = hand
+        self.value = value
+
+    def print_screen(self):
+
+        #Still need to implement: 
+            #need to figure out left and right borders
+            #total works
+            #cards prints 'None'
+
+        length = 23 #initializing to 23 as the base width of the screen, can be adapted if need be
+        full_title = str(self.name) + "'s Hand"
+        print('='*length) #line 1: top border
+        print(f'{full_title:^21}') #line 2: title line
+        print(f'{self.hand}') #line 3: Cards
+        print(f'Total: {self.value}') #line 4: total line
+
+
+
 
 class Game:
     ## To be developed
@@ -137,13 +175,24 @@ def main(): #controller of a hand of poker
         dealer_instance.add_card(dealt_card)
 
     #showing the dealers face up card
-    dealer_instance.show_dealer_card()
+    dealer_instance.show_dealer_card() #will eventually be updated to the new screen
+    
 
     #showing the cards in the hand, only the first for the dealer
-    player_instance.show_full_hand()
-
+    player_inital_hand = player_instance.show_full_hand() #old way, needs to be replaced
+    print(player_inital_hand)
 
     initial_hand_value = player_instance.calc_hand_value()
+    
+    '''
+    Continue implementing below
+    This is where I began implementing the new screen class to test the features
+    '''
+
+
+    player_screen = Screen(name='Player', value= initial_hand_value, hand=player_inital_hand)
+    player_screen.print_screen()
+    
     player_blackjack = False #should stay false unless they get 21 off the rip. 
     if initial_hand_value == 21:
         print('You have blackjack! You win!')
