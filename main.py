@@ -131,29 +131,44 @@ class Screen:
         self.value = value
 
 
-    def print_screen(self):
-    
-        hand_string = ''
-        for card in self.hand:
-            hand_string += f"[{str(card)}] "
+    def print_screen(self,show_total=True, show_full_hand=True):
+
+        #Creating the title line that is dynamic for the name
+        full_title = str(self.name) + "'s Hand"
         
-         #will give us what the max length of the screen should be, if greater than 23. Allows for a min width of 23 no matter what
+        #creating the string that forms card line
+        hand_string = ''
+        if show_full_hand == True: 
+            for card in self.hand:
+                hand_string += f"[{str(card)}] "
+        else: 
+            hand_string += str(self.hand[0])
+
+        #making the width of the screen dynamic
         if len(hand_string) > 23:
             screen_width = len(hand_string)
         else:
             screen_width = 23
 
-
-        total_line = 'Total: ' + str(self.value)
+        total_line = 'Total: ' + str(self.value) #needs to be dynamic
         top_bottom_border = '='*screen_width
-        full_title = str(self.name) + "'s Hand"
 
-        #Actual Output
-        print(f'|{top_bottom_border:^{screen_width}}|')
-        print(f'|{full_title:^{screen_width}}|') #line 2: title line
-        print(f'|{hand_string:^{screen_width}}|') #line 3: Cards
-        print(f'|{total_line:^{screen_width}}|')
-        print(f'|{top_bottom_border:^{screen_width}}|')
+        if show_total == True: 
+            print(f'|{top_bottom_border:^{screen_width}}|') #top border
+            print(f'|{full_title:^{screen_width}}|') #Title line
+            print(f'|{hand_string:^{screen_width}}|') #hand line
+            print(f'|{total_line:^{screen_width}}|') #value line
+            print(f'|{top_bottom_border:^{screen_width}}|') #bottom border
+        else:
+            print(f'|{top_bottom_border:^{screen_width}}|') #top border
+            print(f'|{full_title:^{screen_width}}|') #Title line
+            print(f'|{hand_string:^{screen_width}}|') #hand line
+            print(f'|{top_bottom_border:^{screen_width}}|') #bottom border
+
+        #Whats different for dealer?:
+        # title line, should auto update with the new name, so we are covered with that
+        # should only show first card if dealer or i explicitly state that it can show both
+        # should only show value of the first card if only one card is shown. 
 
 
 
@@ -183,27 +198,20 @@ def main(): #controller of a hand of poker
         dealt_card = deck_instance.deal_card()
         dealer_instance.add_card(dealt_card)
 
-    #showing the dealers face up card
-    dealer_instance.show_dealer_card() #will eventually be updated to the new screen
+    #Showing the dealers intial face up card
+    dealer_hand = dealer_instance.hand
+    dealer_value =dealer_instance.calc_hand_value()
+    dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
+    dealer_screen.print_screen(show_full_hand=False, show_total=False)
 
-    
-
-    #showing the cards in the hand, only the first for the dealer
-    player_inital_hand = player_instance.show_full_hand() #old way, needs to be replaced
-    #print(player_inital_hand) #old
-
+    #Showing the players initial hand
     initial_hand_value = player_instance.calc_hand_value()
-    
-    '''
-    Continue implementing below
-    This is where I began implementing the new screen class to test the features
-    '''
-
-    print('Test Screen')
     player_hand = player_instance.hand
     player_screen = Screen(name='Player', value= initial_hand_value, hand=player_hand)
-    player_screen.print_screen()
+    player_screen.print_screen(show_full_hand=True, show_total=True)
     
+    #Checking to see if player gets blackjack off of the intial hand
+
     player_blackjack = False #should stay false unless they get 21 off the rip. 
     if initial_hand_value == 21:
         print('You have blackjack! You win!')
@@ -224,17 +232,19 @@ def main(): #controller of a hand of poker
             # Need to add a card to the hand. 
             print('-'*20)
             print('You have decided to hit')
-            player_instance.add_card(deck_instance.deal_card())
+            player_instance.add_card(deck_instance.deal_card()) #adding new card to player instance
+            
+            ##The display below needs to be updated
             #display the updated hand.
             print()
-            dealer_instance.show_dealer_card()
-            print('\n')
-            player_instance.show_full_hand()
-            print('\n')
-            #displaye the updated hand value
+            #dealer_instance.show_dealer_card() #old method
+            dealer_screen.print_screen(show_full_hand=False, show_total=False)
+            
+            #need a new screen instance to show the updated hand for the player
             new_hand_value = player_instance.calc_hand_value()
-            print(f'You have a new hand value: {new_hand_value}')
-            print('\n')
+            new_player_hand = player_instance.hand
+            player_screen = Screen(name='Player', value= new_hand_value, hand=new_player_hand)
+            player_screen.print_screen(show_full_hand=True, show_total=True)
 
             #if they bust:
             if int(new_hand_value) > 21:
@@ -246,16 +256,16 @@ def main(): #controller of a hand of poker
         elif player_decision.lower() == 'stand': 
             print()
             print('You have decided to stand')
-            print('\n')
-            
-            print('Dealers Turn')
-            print('-'*20)
-            print('Revealing the Dealers Full Hand: ')
-            dealer_instance.show_full_hand()
-            print('\n')
+            print()
+            print('Dealers turn...')
 
-            pre_hit_or_stand_deal_val = dealer_instance.calc_hand_value()
-            print(f"Dealer's hand value: {pre_hit_or_stand_deal_val}")
+        
+            print('Revealing the Dealers Full Hand: ')
+            dealer_screen.print_screen(show_full_hand=True, show_total=True)
+
+            #I dont think the code below is necessary (will keep commented out for now): 
+            # pre_hit_or_stand_deal_val = dealer_instance.calc_hand_value()
+            # print(f"Dealer's hand value: {pre_hit_or_stand_deal_val}")
 
             continue_dealer_hand = True
             while continue_dealer_hand: #Dealer's Turn Logic
@@ -264,12 +274,18 @@ def main(): #controller of a hand of poker
 
                 if dealer_decision == 'hit':
                     print(f'Dealer has to: {dealer_decision}')
+                    
                     #need to add a card to dealer hand
                     new_card = deck_instance.deal_card()
                     dealer_instance.add_card(new_card)
-                    dealer_instance.show_full_hand()
+
+                    #show dealers new hand
+                    dealer_hand = dealer_instance.hand
+                    dealer_value =dealer_instance.calc_hand_value()
+                    dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
+                    dealer_screen.print_screen(show_full_hand=True, show_total=True)
+
                     deal_hand_val = dealer_instance.calc_hand_value()
-                    print('\n')
                     print(f'Dealer New Hand Value: {deal_hand_val}')
                     print(f'Your Hand Value: {player_instance.calc_hand_value()}')
                     
@@ -283,7 +299,7 @@ def main(): #controller of a hand of poker
                         continue_dealer_hand = False
                 else:
                     #dealer has reached at least 17 and we need to determine who won
-                    dealer_hand_val = dealer_instance.calc_hand_value()
+                    #dealer_hand_val = dealer_instance.calc_hand_value()
                     #print(dealer_hand_val)
 
                     ## Determine winner by comparison
