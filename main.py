@@ -6,7 +6,7 @@ class Card: #card instance
         self.suit = suit
 
     def __str__(self):
-        return f'{self.value} of {self.suit}'
+        return f'{self.value}{self.suit}'
 
 class Deck:
     #Things this class will need to do:
@@ -16,7 +16,7 @@ class Deck:
             #4. count remaining cards (check to see if empty)
 
     card_options = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
-    suits = ['Hearts', 'Clubs', 'Diamonds', 'Spades']
+    suits = ["\u2660", "\u2665", "\u2666", "\u2663"]
 
     def __init__(self):
         self.cards = self.create_deck()
@@ -115,7 +115,7 @@ class Screen:
         # |     DEALER'S HAND    | #line 2
         # |  [10♠] [Hidden]      | #line 3
         # |  Total:              | #line 4
-        # =======================  #line 4
+        # =======================  #line 5
 
         #Player Hand Example:
 
@@ -130,20 +130,30 @@ class Screen:
         self.hand = hand
         self.value = value
 
+
     def print_screen(self):
+    
+        hand_string = ''
+        for card in self.hand:
+            hand_string += f"[{str(card)}] "
+        
+         #will give us what the max length of the screen should be, if greater than 23. Allows for a min width of 23 no matter what
+        if len(hand_string) > 23:
+            screen_width = len(hand_string)
+        else:
+            screen_width = 23
 
-        #Still need to implement: 
-            #need to figure out left and right borders
-            #total works
-            #cards prints 'None'
 
-        length = 23 #initializing to 23 as the base width of the screen, can be adapted if need be
+        total_line = 'Total: ' + str(self.value)
+        top_bottom_border = '='*screen_width
         full_title = str(self.name) + "'s Hand"
-        print('='*length) #line 1: top border
-        print(f'{full_title:^21}') #line 2: title line
-        print(f'{self.hand}') #line 3: Cards
-        print(f'Total: {self.value}') #line 4: total line
 
+        #Actual Output
+        print(f'|{top_bottom_border:^{screen_width}}|')
+        print(f'|{full_title:^{screen_width}}|') #line 2: title line
+        print(f'|{hand_string:^{screen_width}}|') #line 3: Cards
+        print(f'|{total_line:^{screen_width}}|')
+        print(f'|{top_bottom_border:^{screen_width}}|')
 
 
 
@@ -155,7 +165,6 @@ class Game:
 
 
     pass
-
 
 
 
@@ -176,11 +185,12 @@ def main(): #controller of a hand of poker
 
     #showing the dealers face up card
     dealer_instance.show_dealer_card() #will eventually be updated to the new screen
+
     
 
     #showing the cards in the hand, only the first for the dealer
     player_inital_hand = player_instance.show_full_hand() #old way, needs to be replaced
-    print(player_inital_hand)
+    #print(player_inital_hand) #old
 
     initial_hand_value = player_instance.calc_hand_value()
     
@@ -189,8 +199,9 @@ def main(): #controller of a hand of poker
     This is where I began implementing the new screen class to test the features
     '''
 
-
-    player_screen = Screen(name='Player', value= initial_hand_value, hand=player_inital_hand)
+    print('Test Screen')
+    player_hand = player_instance.hand
+    player_screen = Screen(name='Player', value= initial_hand_value, hand=player_hand)
     player_screen.print_screen()
     
     player_blackjack = False #should stay false unless they get 21 off the rip. 
