@@ -181,9 +181,10 @@ class Game:
         self.deck = Deck()
         self.player_instance = Player(name='Player')
         self.dealer_instance = Player(name='Dealer')
+        self.winner = None
 
     def start_game(self):
-        # This function should create the deck, create the intial hands and see if the player gets blackjack from the intial hand
+        # This function should create the deck, create the intial hands
 
         ## Creating the deck and dealing two cards to the player and dealer
         self.deck.shuffle_deck()
@@ -205,23 +206,28 @@ class Game:
         player_screen = Screen(name='Player', value= initial_hand_value, hand=player_hand)
         player_screen.print_screen(show_full_hand=True, show_total=True)
 
+
+    
+    def handle_player_turn(self):
+
+        #This class should:
+        #  see if the player gets blackjack from the intitial hand
+        #  go through the full player turn logic with hitting or standing
+
+        #moved over the black jack off the bat from the start game class
+        initial_hand_value = self.player_instance.calc_hand_value()
         ## Checking to see if the player gets blackjack off the intial cards. 
         player_blackjack = False #should stay false unless they get 21 off the rip. 
         if initial_hand_value == 21:
             print('You have blackjack! You win!')
             player_blackjack = True
+            self.winner = 'Player'
         else: 
             print(f'Your Initial Hand Value: {initial_hand_value}')
-    
-    def handle_player_turn():
-        pass
-        ### Bulk game logic ###
 
-        ## Player Logic First as they have first move
 
-        ## if hit, add a card and ask again until they bust or stand
-        continue_hand = True
-        while continue_hand and not(player_blackjack): #will continue the hand as long as it is true and the player hasn't already got blackjack. 
+        continue_player = True
+        while continue_player and not(player_blackjack): #will continue the hand as long as it is true and the player hasn't already got blackjack. 
             player_decision = self.player_instance.hit_or_stand()
             if player_decision.lower() == 'hit':
                 # Need to add a card to the hand. 
@@ -233,7 +239,10 @@ class Game:
                 #display the updated hand.
                 print()
                 #dealer_instance.show_dealer_card() #old method
-                self.dealer_screen.print_screen(show_full_hand=False, show_total=False)
+                dealer_value = self.dealer_instance.calc_hand_value()
+                dealer_hand = self.dealer_instance.hand
+                dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
+                dealer_screen.print_screen(show_full_hand=False, show_total=False)
                 
                 #need a new screen instance to show the updated hand for the player
                 new_hand_value = self.player_instance.calc_hand_value()
@@ -244,7 +253,8 @@ class Game:
                 #if they bust:
                 if int(new_hand_value) > 21:
                     print('You have busted. End of Hand')
-                    continue_hand = False
+                    continue_player = False
+                    self.winner = 'Dealer'
                 else: 
                     continue
                 
@@ -252,209 +262,87 @@ class Game:
                 print()
                 print('You have decided to stand')
                 print()
-                print('Dealers turn...')
+                continue_player = False
 
+
+    def handle_dealer_turn(self): #to be developed
+        print('Dealers turn...')
+        print('Revealing the Dealers Full Hand: ')
+        dealer_value = self.dealer_instance.calc_hand_value()
+        dealer_hand = self.dealer_instance.hand
+        dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
+        dealer_screen.print_screen(show_full_hand=True, show_total=True)
+        continue_dealer_hand = True
+        while continue_dealer_hand: #Dealer's Turn Logic
+            dealer_decision = self.dealer_instance.hit_or_stand()
             
-                print('Revealing the Dealers Full Hand: ')
+            if dealer_decision == 'hit':
+                print(f'Dealer has to: {dealer_decision}')
+                
+                #need to add a card to dealer hand
+                new_card = self.deck.deal_card()
+                self.dealer_instance.add_card(new_card)
+
+                #show dealers new hand
+                dealer_hand = self.dealer_instance.hand
+                dealer_value = self.dealer_instance.calc_hand_value()
+                dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
                 dealer_screen.print_screen(show_full_hand=True, show_total=True)
 
-                #I dont think the code below is necessary (will keep commented out for now): 
-                # pre_hit_or_stand_deal_val = dealer_instance.calc_hand_value()
-                # print(f"Dealer's hand value: {pre_hit_or_stand_deal_val}")
+                deal_hand_val = self.dealer_instance.calc_hand_value()
+                print(f'Dealer New Hand Value: {deal_hand_val}')
+                print(f'Your Hand Value: {self.player_instance.calc_hand_value()}')
+                
+                if deal_hand_val == 21:
+                    print('Dealer has won.')
+                    continue_dealer_hand = False
+                    self.winner = 'Dealer'
+                    break
+                elif deal_hand_val > 21:
+                    print('Dealer has busted. You win.')
+                    continue_dealer_hand = False
+                    self.winner = 'Player'
+            else:
+                #dealer has reached at least 17 and we need to determine who won
+                #dealer_hand_val = dealer_instance.calc_hand_value()
+                #print(dealer_hand_val)
 
-                continue_dealer_hand = True
-                while continue_dealer_hand: #Dealer's Turn Logic
-                    dealer_decision = self.dealer_instance.hit_or_stand()
-                    
-                    if dealer_decision == 'hit':
-                        print(f'Dealer has to: {dealer_decision}')
-                        
-                        #need to add a card to dealer hand
-                        new_card = self.deck.deal_card()
-                        self.dealer_instance.add_card(new_card)
+                ## Determine winner by comparison
+                if self.player_instance.calc_hand_value() > self.dealer_instance.calc_hand_value():
+                    print('You have a better hand.')
+                    print('You win!')
+                    self.winner = 'Player'
+                elif self.player_instance.calc_hand_value() < self.dealer_instance.calc_hand_value():
+                    print('Dealer has a better hand.')
+                    print('Dealer wins.')
+                    self.winner = 'Dealer'
+                else:
+                    print('Push')
+                    self.winner ='Push'
 
-                        #show dealers new hand
-                        dealer_hand = self.dealer_instance.hand
-                        dealer_value = self.dealer_instance.calc_hand_value()
-                        dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
-                        dealer_screen.print_screen(show_full_hand=True, show_total=True)
+                continue_dealer_hand = False
 
-                        deal_hand_val = self.dealer_instance.calc_hand_value()
-                        print(f'Dealer New Hand Value: {deal_hand_val}')
-                        print(f'Your Hand Value: {self.player_instance.calc_hand_value()}')
-                        
-                        if deal_hand_val == 21:
-                            print('Dealer has won.')
-                            continue_hand = False
-                            break
-                        elif deal_hand_val > 21:
-                            print('Dealer has busted. You win.')
-                            continue_hand = False
-                            continue_dealer_hand = False
-                    else:
-                        #dealer has reached at least 17 and we need to determine who won
-                        #dealer_hand_val = dealer_instance.calc_hand_value()
-                        #print(dealer_hand_val)
-
-                        ## Determine winner by comparison
-                        if self.player_instance.calc_hand_value() > self.dealer_instance.calc_hand_value():
-                            print('You have a better hand.')
-                            print('You win!')
-                        elif self.player_instance.calc_hand_value() < self.dealer_instance.calc_hand_value():
-                            print('Dealer has a better hand.')
-                            print('Dealer wins.')
-                        else:
-                            print('Push')
-
-                        continue_hand = False
-                        continue_dealer_hand = False
-            
-
-
-    def handle_dealer_turn(): #to be developed
-        pass
 
     def exit_game(): #to be developed
         pass
 
 
 
-## main needs to be updated once the refactor is complete
-def main(): #controller of a hand of poker
+def main():
+    #for now we will run one instance, no loop, until all bugs are cleared. 
+    game_instance = Game() #starting the game instance
+    game_instance.start_game() #kicking off the game
     
-    deck_instance = Deck() #creates a deck
-    deck_instance.shuffle_deck() #shuffles the deck
-    player_instance = Player(name='Player')
-    dealer_instance = Player(name='Dealer')
-
-
-    # creating the first hand for the player and dealer
-    for i in range(2):
-        dealt_card = deck_instance.deal_card()
-        player_instance.add_card(dealt_card)
-        dealt_card = deck_instance.deal_card()
-        dealer_instance.add_card(dealt_card)
-
-    #Showing the dealers intial face up card
-    dealer_hand = dealer_instance.hand
-    dealer_value =dealer_instance.calc_hand_value()
-    dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
-    dealer_screen.print_screen(show_full_hand=False, show_total=False)
-
-    #Showing the players initial hand
-    initial_hand_value = player_instance.calc_hand_value()
-    player_hand = player_instance.hand
-    player_screen = Screen(name='Player', value= initial_hand_value, hand=player_hand)
-    player_screen.print_screen(show_full_hand=True, show_total=True)
+    #logic needs to be implemented to kick off player
+    game_instance.handle_player_turn()
+    #logic needs to be implemented to kick off dealer, should it be necessary
+    game_instance.handle_dealer_turn()
     
-    #Checking to see if player gets blackjack off of the intial hand
-
-    player_blackjack = False #should stay false unless they get 21 off the rip. 
-    if initial_hand_value == 21:
-        print('You have blackjack! You win!')
-        player_blackjack = True
-    else: 
-        print(f'Your Initial Hand Value: {initial_hand_value}')
-
-
-    ### Bulk game logic ###
-
-    ## Player Logic First as they have first move
-
-    ## if hit, add a card and ask again until they bust or stand
-    continue_hand = True
-    while continue_hand and not(player_blackjack): #will continue the hand as long as it is true and the player hasn't already got blackjack. 
-        player_decision = player_instance.hit_or_stand()
-        if player_decision.lower() == 'hit':
-            # Need to add a card to the hand. 
-            print('-'*20)
-            print('You have decided to hit')
-            player_instance.add_card(deck_instance.deal_card()) #adding new card to player instance
-            
-            ##The display below needs to be updated
-            #display the updated hand.
-            print()
-            #dealer_instance.show_dealer_card() #old method
-            dealer_screen.print_screen(show_full_hand=False, show_total=False)
-            
-            #need a new screen instance to show the updated hand for the player
-            new_hand_value = player_instance.calc_hand_value()
-            new_player_hand = player_instance.hand
-            player_screen = Screen(name='Player', value= new_hand_value, hand=new_player_hand)
-            player_screen.print_screen(show_full_hand=True, show_total=True)
-
-            #if they bust:
-            if int(new_hand_value) > 21:
-                print('You have busted. End of Hand')
-                continue_hand = False
-            else: 
-                continue
-             
-        elif player_decision.lower() == 'stand': 
-            print()
-            print('You have decided to stand')
-            print()
-            print('Dealers turn...')
-
-        
-            print('Revealing the Dealers Full Hand: ')
-            dealer_screen.print_screen(show_full_hand=True, show_total=True)
-
-            #I dont think the code below is necessary (will keep commented out for now): 
-            # pre_hit_or_stand_deal_val = dealer_instance.calc_hand_value()
-            # print(f"Dealer's hand value: {pre_hit_or_stand_deal_val}")
-
-            continue_dealer_hand = True
-            while continue_dealer_hand: #Dealer's Turn Logic
-                dealer_decision = dealer_instance.hit_or_stand()
-                
-                if dealer_decision == 'hit':
-                    print(f'Dealer has to: {dealer_decision}')
-                    
-                    #need to add a card to dealer hand
-                    new_card = deck_instance.deal_card()
-                    dealer_instance.add_card(new_card)
-
-                    #show dealers new hand
-                    dealer_hand = dealer_instance.hand
-                    dealer_value =dealer_instance.calc_hand_value()
-                    dealer_screen = Screen(name='Dealer', value=dealer_value, hand=dealer_hand)
-                    dealer_screen.print_screen(show_full_hand=True, show_total=True)
-
-                    deal_hand_val = dealer_instance.calc_hand_value()
-                    print(f'Dealer New Hand Value: {deal_hand_val}')
-                    print(f'Your Hand Value: {player_instance.calc_hand_value()}')
-                    
-                    if deal_hand_val == 21:
-                        print('Dealer has won.')
-                        continue_hand = False
-                        break
-                    elif deal_hand_val > 21:
-                        print('Dealer has busted. You win.')
-                        continue_hand = False
-                        continue_dealer_hand = False
-                else:
-                    #dealer has reached at least 17 and we need to determine who won
-                    #dealer_hand_val = dealer_instance.calc_hand_value()
-                    #print(dealer_hand_val)
-
-                    ## Determine winner by comparison
-                    if player_instance.calc_hand_value() > dealer_instance.calc_hand_value():
-                        print('You have a better hand.')
-                        print('You win!')
-                    elif player_instance.calc_hand_value() < dealer_instance.calc_hand_value():
-                        print('Dealer has a better hand.')
-                        print('Dealer wins.')
-                    else:
-                        print('Push')
-
-                    continue_hand = False
-                    continue_dealer_hand = False
-            
 
 main()
 
 
+if __name__ == "__main__":
+    main()
 
     
-
