@@ -1,3 +1,10 @@
+## Dev Notes
+# Implementations:
+# splitting logic into the game
+# betting, and subsequently doubling down. Need to research more about the game to understand when this comes into play
+# data output to two or more csv's for game and all time play analytics. 
+
+
 import random
 
 class Card: #card instance
@@ -172,16 +179,13 @@ class Screen:
 
 
 class Game:
-    ## To be developed
-
-    ## Will be refactoring most of the current code from the main function into this class to allow for instances of a game.
-    ## The idea is to allow for a string of hands to be played back to back until the user no longer wants to play.
 
     def __init__(self):
         self.deck = Deck()
         self.player_instance = Player(name='Player')
         self.dealer_instance = Player(name='Dealer')
         self.winner = None
+        self.play_again = None
 
     def start_game(self):
         # This function should create the deck, create the intial hands
@@ -263,7 +267,7 @@ class Game:
                 print('You have decided to stand')
                 print()
                 continue_player = False
-
+        
 
     def handle_dealer_turn(self): #to be developed
         print('Dealers turn...')
@@ -321,26 +325,38 @@ class Game:
                     self.winner ='Push'
 
                 continue_dealer_hand = False
+    
+    def continue_or_quit(self):
+        c_or_q = input('Would you like to play another hand (y/n)?: ')
+        if c_or_q.lower() == 'y':
+            self.play_again = True
+        else:
+            self.play_again = False
 
-
-    def exit_game(): #to be developed
-        pass
 
 
 
 def main():
-    #for now we will run one instance, no loop, until all bugs are cleared. 
-    game_instance = Game() #starting the game instance
-    game_instance.start_game() #kicking off the game
-    
-    #logic needs to be implemented to kick off player
-    game_instance.handle_player_turn()
-    #logic needs to be implemented to kick off dealer, should it be necessary
-    game_instance.handle_dealer_turn()
-    
+    play = True
+    while play:
+        #for now we will run one instance, no loop, until all bugs are cleared. 
+        game_instance = Game() #starting the game instance
+        game_instance.start_game() #kicking off the game
+        
+        #logic needs to be implemented to kick off player
+        #PLAYER CAN EITHER STAND, BUST, WIN, so we only kick off dealer's turn if there is no terminal point for the player (i.e they lose or they win (blackjack)
+            #should they stand there is no definitive winner, so dealer's turn kicks off. 
+        game_instance.handle_player_turn()
+        if game_instance.winner == None:  
+            game_instance.handle_dealer_turn()
 
-main()
-
+        game_instance.continue_or_quit() #prompts the player if they want to continue of quit
+        if game_instance.play_again == True:
+            print()
+            print('New Hand')
+        else:
+            play = False
+            print('Thanks for playing!') #eventually we will give the player their analytics, instead of just saying thank you!
 
 if __name__ == "__main__":
     main()
