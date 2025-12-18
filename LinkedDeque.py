@@ -10,7 +10,12 @@ class LinkedDeque:
         self.tail = None
     
     def pushFront(self, value):
-        self.head = Node(value, next=self.head)
+        if self.head == None: #if we are dealing with an empty deque
+            self.head = Node(value, next=None)
+            self.tail = self.head
+        else:
+            self.head = Node(value, next = self.head)
+
 
     def popFront(self):
         if self.isEmpty():
@@ -24,7 +29,7 @@ class LinkedDeque:
         if self.isEmpty():
             raise IndexError("Stack is empty")
         else:
-            return
+            return self.head
 
 
     def isEmpty(self) -> bool:
