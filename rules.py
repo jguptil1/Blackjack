@@ -40,8 +40,8 @@ class Rules:
     allow_surrender: bool = False
 
     # Bets (optional)
-    min_bet: int = 1
-    max_bet: Optional[int] = None
+    min_bet: int = 10
+    max_bet: Optional[int] = 200
 
     # ---------- Policy helpers ----------
     def dealer_should_hit(self, hand_total: int, is_soft: bool) -> bool:
@@ -53,6 +53,7 @@ class Rules:
         # hand_total == 17
         return self.dealer_hits_soft_17 and is_soft
 
+    #FIXME: not quite sure I will need this, given it is under player class
     def can_create_new_hand_via_split(self, current_hand_count: int) -> bool:
         """Splitting creates +1 hand; ensure we don't exceed max_hands."""
         return self.allow_split and (current_hand_count + 1) <= self.max_hands

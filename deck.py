@@ -5,9 +5,8 @@ from LinkedDeque import LinkedDeque
 
 class Deck:
     
-    def __init__(self, rules: Rules):
-        self.rules = rules
-        self.numOfDecks = self.rules.num_decks
+    def __init__(self):
+        self.numOfDecks = Rules.num_decks
         # INITIALIZING THE DECK
         # Starts as an array to collect all needed cards for the shoe size
         self.suitsAvailable = ["spades", "clubs", "diamonds", "hearts"]
@@ -53,3 +52,4 @@ class Deck:
               print(currentCard)
 
               currentNode = currentNode.next
+

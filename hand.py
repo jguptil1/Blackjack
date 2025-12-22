@@ -2,24 +2,17 @@ from card import Card
 
 class Hand:
 
-    def __init__(self, betSize):
-        #empty hand constructor
-        self.handArray = [] #array full of Card Objects
-        self.handValue = 0
-        self.aceCount = 0
-        self.createdBySplit = False
-        self.handState = None #nothing has happened yet
-        self.betSize =  betSize
-
     def __init__(self, card:Card, betSize):
         #construction from split
         self.handArray = []
         self.handValue = 0
         self.aceCount = 0
-        self.updateHand(card)
-        self.createdBySplit = True
-        self.handState = None #nothing has happened yet
+        if card != None: 
+            self.createdBySplit = True
+            self.updateHand(card)
+        self.isDone = False #nothing has happened yet
         self.betSize = betSize
+        self.isSoft = False
 
 
     #helper function
@@ -47,6 +40,7 @@ class Hand:
             if currentHandValue + 10 <= 21:
                 #upgrading one of the aces
                 currentHandValue += 10
+                self.isSoft = True
 
         self.handValue = currentHandValue
 
@@ -63,24 +57,36 @@ class Hand:
             print(card)
 
 
-    def popCardFromHand(self) -> Card:
-        topCard = self.handArray[0]
-        self.handArray[0] = self.handArray[1] #moving second card to head pos
-        return topCard
-
-
+    def removeBottomCardFromHand(self) -> Card:
+        if len(self.handArray >= 2):
+            card = self.handArray.pop(1)
+            return card
 
     def getHandValue(self) -> int:
         return self.handValue
 
-    def isBlackjack(self) -> bool: #terminal
-        self.handState = "done"
-        return self.handValue == 21
+    def isBlackjack(self) -> bool:
+        if self.handValue == 21 and len(self.handArray) == 2:
+            self.handState = "done"
+            return True
+        else:
+            return False
     
     def isSoft(self) -> bool:
-        self.handState = "playable"
-        return self.aceCount > 0
+        return self.isSoft
         
-    def isBust(self): #terminal
-        self.handState = "done"
-        return self.handValue > 21
+    def isBust(self) -> bool:
+        if self.handValue > 21:
+            return True
+        else:
+            return False
+    
+    def isDone(self)-> bool:
+        return self.isDone
+        
+
+    def __len__(self):
+        return len(self.handArray)
+
+    def getHandState(self):
+        return self.handState
