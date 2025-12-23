@@ -6,7 +6,7 @@ class Player:
     def __init__(self, name, bankRollAmount, rules:Rules):
         self.rules = rules
         self.name = name
-        self.hands = [Hand()]
+        self.hands = [Hand(betSize=self.rules.min_bet, card=None)]
         self.bankRoll = bankRollAmount
         self.amountOfSplits = 0
 
@@ -52,7 +52,7 @@ class Player:
         """
         This returns a list determing if split eligable and double eligable
         """
-        avaialable_actions = []
+        avaialable_actions = ["quit"]
         
         #DETERMINING SPLIT from helper function
         if (self.determine_split(hand)):
@@ -66,7 +66,7 @@ class Player:
         avaialable_actions.append("stand")
 
         #DETERMINING HIT
-        if (not hand.isDone() and hand.handValue < 21):
+        if (not hand.isDone and hand.handValue < 21):
             avaialable_actions.append("hit")
 
         return avaialable_actions
@@ -101,6 +101,9 @@ class Player:
 
     def printBankRoll(self):
         print(self.bankRoll)
+    
+    def changeBetSize(self, handIdx:int, amount:int)-> None:
+        self.hands[handIdx].betSize = amount
 
     #HAND MANAGEMENT
 
@@ -111,7 +114,6 @@ class Player:
         bankRoll -= betSize
         betSize *= 2
         
-
     def splitHand(self, hand) -> None:
         if self.determine_split():
             self.amountOfSplits += 1
@@ -120,16 +122,26 @@ class Player:
             self.bankRoll -= newHand.betSize
             self.hands.append(newHand)
 
-    def displayHands(self, amountOfCards):
+    def displayHands(self, amountOfCards:str):
         if amountOfCards == "all":
             for hand in self.hands:
                 hand.displayHand()
         elif amountOfCards == "one":
-            print(self.hands[0].displayTopCard)
+            print(self.hands[0].displayTopCard())
 
-    def resetHands(self):
-        self.hands = [Hand()]
+    def resetHands(self, betChange:int | None):
+        if betChange == None:
+            self.hands = [Hand(betSize=self.rules.min_bet, card=None)]
+        else:
+            self.hands = [Hand(betSize=betChange, card=None)]
 
+
+    #DEALER SPECIFIC
+    def getDealerFaceValue(self) -> int:
+        #will only have one hand so index will always be 0
+        #will always have first card (index 0) as face card
+        return self.hands[0].handArray[0].valueList
+            
         
 
 

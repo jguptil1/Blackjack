@@ -2,14 +2,16 @@ from card import Card
 
 class Hand:
 
-    def __init__(self, card:Card, betSize):
+    def __init__(self, betSize: int, card: Card | None = None):
         #construction from split
         self.handArray = []
         self.handValue = 0
         self.aceCount = 0
-        if card != None: 
+        if card is not None: 
             self.createdBySplit = True
             self.updateHand(card)
+        else:
+            self.createdBySplit = False
         self.isDone = False #nothing has happened yet
         self.betSize = betSize
         self.isSoft = False
@@ -50,7 +52,6 @@ class Hand:
         self.handArray.append(newCard)
         # will call updateHandValue
         self.updateHandValue()
-
 
     def displayHand(self) -> None:
         for card in self.handArray:

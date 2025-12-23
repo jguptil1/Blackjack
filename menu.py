@@ -5,9 +5,9 @@ class Menus:
     def __init__(self):
         self.rules = Rules()
 
-    def gameStartMenu():
+    def gameStartMenu(self):
         print("Welcome to Poker!")
 
     def printTableRules(self):
-        print(f"Min Bet: {self.rules.minBet}")
-        print(f"Max Bet: {self.rules.maxBet}")
+        print(f"Min Bet: {self.rules.min_bet}")
+        print(f"Max Bet: {self.rules.max_bet}")

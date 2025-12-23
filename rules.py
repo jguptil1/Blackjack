@@ -14,7 +14,7 @@ class SplitPairRule(Enum):
 @dataclass(frozen=True)
 class Rules:
     # Shoe / dealing
-    num_decks: int = 1
+    num_decks: int = 4
 
     # Dealer behavior
     dealer_hits_soft_17: bool = True  # H17 if True, S17 if False
