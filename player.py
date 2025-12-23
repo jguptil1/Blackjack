@@ -104,8 +104,12 @@ class Player:
 
     #HAND MANAGEMENT
 
-    def double(self, hand) -> None: #FIXME
+    def double(self, handNum) -> None: 
         #bankroll needs to be decremented and the betSize needs to be doubled
+        #need to get the bet size from the hand
+        betSize = self.hands[handNum].betSize
+        bankRoll -= betSize
+        betSize *= 2
         
 
     def splitHand(self, hand) -> None:
@@ -116,9 +120,12 @@ class Player:
             self.bankRoll -= newHand.betSize
             self.hands.append(newHand)
 
-    def displayHands(self):
-        for hand in self.hands:
-            hand.displayHand()
+    def displayHands(self, amountOfCards):
+        if amountOfCards == "all":
+            for hand in self.hands:
+                hand.displayHand()
+        elif amountOfCards == "one":
+            print(self.hands[0].displayTopCard)
 
     def resetHands(self):
         self.hands = [Hand()]

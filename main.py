@@ -1,4 +1,6 @@
 from game import Game
+from humanCLI import HumanCLI
 
-game = Game()
-game.run()
+#for now just run the CLI instance
+hCLI = HumanCLI()
+hCLI.run()

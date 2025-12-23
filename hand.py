@@ -55,6 +55,9 @@ class Hand:
     def displayHand(self) -> None:
         for card in self.handArray:
             print(card)
+    
+    def displayTopCard(self) -> Card:
+        return self.handArray[0]
 
 
     def removeBottomCardFromHand(self) -> Card:
@@ -83,7 +86,6 @@ class Hand:
     
     def isDone(self)-> bool:
         return self.isDone
-        
 
     def __len__(self):
         return len(self.handArray)
